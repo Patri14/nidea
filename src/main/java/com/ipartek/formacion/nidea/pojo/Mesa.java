@@ -1,83 +1,66 @@
-//definici�n package
+//1.definicion package
 package com.ipartek.formacion.nidea.pojo;
 
-//import (ahora mismo no tenemos ninguno)
+//2. Imports => ahora mismo no tenemos ninguno
 
-//definici�n Clase
-public class Mesa {
-
-	// precio en �
-	public static final int PRECIO_PATA = 1;
-	public static final int PRECIO_M2 = 5;
-	public static final int PRECIO_MATERIAL_MADERA = 4;
-	public static final int PRECIO_MATERIAL_ACERO = 6;
-	public static final int PRECIO_MATERIAL_ALUMINIO = 5;
-	public static final int PRECIO_MATERIAL_PLASTICO = 2;
-	public static final int PRECIO_COLOR_CUSTOM = 23;
-
-	public static String PRECIO_COLOR_NAME_CUSTOM = "custom";
-
-	// tipo material
-	public static final int MATERIAL_MADERA = 1;
-	public static final int MATERIAL_ACERO = 2;
-	public static final int MATERIAL_ALUMINIO = 3;
-	public static final int MATERIAL_PLASTICO = 4;
-
-	// atributos
-	// siempre privados para mantener la encapsulaci�n
-	private int numeroPatas;
-	private int dimension;// m2
-	private String color;
-	private int material;
-	private boolean custom;
-
-	private int total;
-
-	/*
-	 * 5. M�todos 5.1 Constructores 5.2 Getters y Setters 5.3 Otros
-	 */
+//3. definicion Clase
+/**
+ * 
+ * @author ur00
+ *
+ */
+public class Mesa implements Cloneable {
 
 	/**
-	 * sirve para documenta JavaDoc
-	 * 
-	 * @author para firmar
-	 * @param numeroPatas
-	 *            int en caso de ser negativo se inicializa con 0
+	 * precio en €
 	 */
+	public static final int PRECIO_PATA = 1;
+	public static final int PRECIO_M2 = 5;
+	public static final int PRECIO_COLOR_CUSTOM = 23;
+	public static final String COLOR_POR_DEFECTO = "#FFF";
 
-	/*
-	 * public Mesa() { super();
-	 * 
-	 * this.setNumeroPatas(numeroPatas); }
-	 */
+	// 4. Atributos siempre PRIVATE para mantener la encapsulacion
+	private int numeroPatas;
+	private int dimension; // metros cuadrados
+	private String color;
+	private boolean custom;
+	private Material material;
 
 	public Mesa() {
+
+		// llamar siempre a super
 		super();
+
+		// inicializar los atributos
 		this.numeroPatas = 4;
-		this.color = "blanco";
-		this.material = MATERIAL_MADERA;
 		this.dimension = 1;
+		this.color = COLOR_POR_DEFECTO; // blanco
+		this.custom = false;
+		this.material = new Material();
 	}
 
-	// constructor con un parametro mas, primero llamas al constructor
-	// padre(constructor por defecto) this
-	public Mesa(int material) {
-		this();
+	public boolean isCustom() {
+		return custom;
+	}
+
+	public void setCustom(boolean custom) {
+		this.custom = custom;
+	}
+
+	public static int getPrecioPata() {
+		return PRECIO_PATA;
+	}
+
+	public static int getPrecioM2() {
+		return PRECIO_M2;
+	}
+
+	public void setMaterial(Material material) {
 		this.material = material;
 	}
 
-	// sobrecargar, para que llame al que sobrecargas tienes que pasarle el
-	// parametro
-	public Mesa(int material, int dimesion) {
-		this(material);
-		this.material = material;
-	}
-	/* getters y setters */
-
-	@Override
-	public String toString() {
-		return "Mesa [numeroPatas=" + numeroPatas + ", dimension=" + dimension + ", color=" + color + ", material="
-				+ material + ", total=" + total + "]";
+	public Mesa(int dimension) {
+		this.dimension = dimension;
 	}
 
 	public int getNumeroPatas() {
@@ -85,22 +68,19 @@ public class Mesa {
 	}
 
 	/**
-	 * if numero de patas es menos que cero, me devuelves un cero, else las patas q
-	 * me pases, para que nunca pueda ser negativa la cantidad
+	 * Si numeroPatas < 0 asignamos valor 1, else numeroPatas
 	 * 
 	 * @param numeroPatas
+	 *            int
+	 * @throws MesaException
 	 */
-	public void setNumeroPatas(int numeroPatas) {
+	public void setNumeroPatas(int numeroPatas) throws MesaException {
+		if (numeroPatas <= 0) {
+			throw new MesaException(MesaException.MENSAJE_PATAS);
+		}
 
-		this.numeroPatas = (numeroPatas <= 0) ? 1 : numeroPatas;
+		this.numeroPatas = numeroPatas;
 	}
-
-	/**
-	 * Calculamos el precio de la mesa en funcion de los materiales usados
-	 * 
-	 * @see consultar todas las constantes definidas para los precios
-	 * @return int precio en �
-	 */
 
 	public int getDimension() {
 		return dimension;
@@ -118,57 +98,74 @@ public class Mesa {
 		this.color = color;
 	}
 
-	public int getMaterial() {
-		return material;
+	public Material getMaterial() {
+		return this.material;
 	}
 
-	public void setMaterial(int material) {
-		this.material = material;
+	@Override
+	public String toString() {
+		return "Mesa [numeroPatas=" + numeroPatas + ", dimension=" + dimension + ", color=" + color + ", material="
+				+ material + "]";
 	}
 
-	public boolean isCustom() {
-		return custom;
-	}
-
-	public void setCustom(boolean custom) {
-		this.custom = custom;
-	}
-
+	/**
+	 * Calculamos el precio de la mesa en funcion de los materiales usados.
+	 * 
+	 * @see consultar todas las constantes definidas para los precios
+	 * @return int precio en €
+	 */
 	public int getPrecio() {
-		int result = 0;
 
-		result = (this.numeroPatas * this.PRECIO_PATA) + (this.dimension * this.PRECIO_M2);
+		int resul = 0;
 
-		switch (this.material) {
+		resul += this.numeroPatas * PRECIO_PATA;
+		resul += this.dimension * PRECIO_M2;
 
-		case MATERIAL_MADERA:
-			result = result + PRECIO_MATERIAL_MADERA;
-			break;
-
-		case MATERIAL_ACERO:
-			result = result + PRECIO_MATERIAL_ACERO;
-			break;
-
-		case MATERIAL_ALUMINIO:
-			result = result + PRECIO_MATERIAL_ALUMINIO;
-			break;
-
-		default:
-			result = result + PRECIO_MATERIAL_PLASTICO;
-			break;
-
+		if (!COLOR_POR_DEFECTO.equalsIgnoreCase(this.color)) {
+			resul += PRECIO_COLOR_CUSTOM;
 		}
 
-		if (PRECIO_COLOR_NAME_CUSTOM.equalsIgnoreCase(this.color)) {
-			result += PRECIO_COLOR_CUSTOM;
-		}
+		resul += material.getPrecio();
 
-		return result;
-
+		return resul;
 	}
 
-	public void setTotal(int total) {
-		this.total = total;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + dimension;
+		result = prime * result + numeroPatas;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Mesa other = (Mesa) obj;
+		if (color == null) {
+			if (other.color != null)
+				return false;
+		} else if (!color.equals(other.color))
+			return false;
+		if (dimension != other.dimension)
+			return false;
+		if (material != other.material)
+			return false;
+		if (numeroPatas != other.numeroPatas)
+			return false;
+		return true;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 }

@@ -1,5 +1,7 @@
 <jsp:include page="template/head.jsp"></jsp:include>
 <jsp:include page="template/navbar.jsp"></jsp:include>
+<jsp:include page="template/alert.jsp"></jsp:include>
+
 <% 
 	String nombre = "Cliente";
 %>
